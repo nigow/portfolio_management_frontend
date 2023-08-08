@@ -1,0 +1,28 @@
+.foldable-sidebar {
+    width: 25%;
+    min-width: 250px;
+    background-color: #333;
+    color: white;
+    overflow: hidden;
+    transition: width 0.3s;
+}
+
+.sidebar-item {
+    padding: 10px 20px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.sidebar-item:hover {
+    background-color: #444;
+}
+
+.expanded {
+    width: 100%;
+}
+
+.sub-items {
+    list-style-type: none;
+    padding-left: 20px;
+    margin-top: 5px;
+}
