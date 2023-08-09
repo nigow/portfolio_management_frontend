@@ -31,3 +31,13 @@ body, margin, padding {
   width: 80%;
   margin: 0 auto;
 }
+
+.doughnut-container {
+  display: flex;
+  margin-top: 20px;
+}
+
+.stack {
+  display: flex;
+  flex-direction: column;
+}

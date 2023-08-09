@@ -12,6 +12,8 @@ import {
     Tooltip,
     Legend,
 } from "chart.js";
+import 'chart.js/auto'
+import DoughnutChart from './components/DoughnutChart';
 
 ChartJS.register(
     CategoryScale,
@@ -20,7 +22,7 @@ ChartJS.register(
     LineElement,
     Title,
     Tooltip,
-    Legend
+    Legend,
 );
 
 const sidebarItems = [
@@ -47,6 +49,26 @@ const mockNetWorthData = {
     ],
 };
 
+const mockIncomeData = {
+    labels: ['CitiBank', 'JPMC', 'Bank of America'],
+    datasets: [
+        {
+            label: 'Income',
+            data: [1000, 3000, 1500], // Fake values, will use real data later
+        },
+    ],
+};
+
+const mockExpenditureData = {
+    labels: ['CitiBank', 'JPMC', 'Bank of America'],
+    datasets: [
+        {
+            label: 'Expenditure',
+            data: [500, 2000, 800], // Fake values, will use real data later
+        },
+    ],
+};
+
 function App() {
     return (
         <div className="app-container">
@@ -54,12 +76,22 @@ function App() {
             <div className="main-panel">
                 <h2>Portfolio Management System</h2>
                 <h3>Net Worth</h3>
-                <div className="chart-container">
-                    <Line data={mockNetWorthData} options={{ maintainAspectRatio: false }} />
+                <div className="stack">
+                    <div className="chart-container">
+                        <Line data={mockNetWorthData} options={{ maintainAspectRatio: false }} />
+                    </div>
+                    <DoughnutChart
+                        title="Cash Flow"
+                        incomeData={mockIncomeData.datasets[0].data}
+                        expenditureData={mockExpenditureData.datasets[0].data}
+                        labels={mockIncomeData.labels}
+                    />
                 </div>
+
             </div>
         </div>
     );
 }
+
 
 export default App;
