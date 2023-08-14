@@ -27,6 +27,10 @@ body, margin, padding {
   padding: 20px;
 }
 
+.main-panel h3 {
+  text-align: center;
+}
+
 .chart-container {
   width: 80%;
   margin: 0 auto;
