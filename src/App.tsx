@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import './App.css';
 import FoldableSidebar from './components/FoldableSidebar';
 import { Line } from 'react-chartjs-2';
@@ -14,6 +14,7 @@ import {
 } from "chart.js";
 import 'chart.js/auto'
 import DoughnutChart from './components/DoughnutChart';
+import {useDispatch, useSelector} from "react-redux";
 
 ChartJS.register(
     CategoryScale,
@@ -49,27 +50,29 @@ const mockNetWorthData = {
     ],
 };
 
-const mockIncomeData = {
-    labels: ['CitiBank', 'JPMC', 'Bank of America'],
-    datasets: [
-        {
-            label: 'Income',
-            data: [1000, 3000, 1500], // Fake values, will use real data later
-        },
-    ],
-};
-
-const mockExpenditureData = {
-    labels: ['CitiBank', 'JPMC', 'Bank of America'],
-    datasets: [
-        {
-            label: 'Expenditure',
-            data: [500, 2000, 800], // Fake values, will use real data later
-        },
-    ],
-};
+interface CashFlowData {
+    labels: string[];
+    data: number[];
+}
 
 function App() {
+    const dispatch = useDispatch();
+
+    const expenditureData = useSelector((state: { expenditureData: CashFlowData }) => state.expenditureData);
+    const incomeData = useSelector((state: { incomeData: CashFlowData }) => state.incomeData);
+
+    const isExpenditureDataLoaded: boolean = useSelector((state: { expenditureData: CashFlowData }) => state.expenditureData.labels.length > 0);
+    const isIncomeDataLoaded: boolean = useSelector((state: { expenditureData: CashFlowData }) => state.expenditureData.labels.length > 0);
+
+    useEffect(() => {
+        if (!isExpenditureDataLoaded) {
+            dispatch({ type: 'expenditureData/loadInitialData', payload: expenditureData });
+        }
+        if (!isIncomeDataLoaded) {
+            dispatch({ type: 'incomeData/loadInitialData', payload: incomeData });
+        }
+    }, [dispatch, isExpenditureDataLoaded, isIncomeDataLoaded]);
+
     return (
         <div className="app-container">
             <FoldableSidebar items={sidebarItems} />
@@ -80,14 +83,17 @@ function App() {
                     <div className="chart-container">
                         <Line data={mockNetWorthData} options={{ maintainAspectRatio: false }} />
                     </div>
-                    <DoughnutChart
-                        title="Cash Flow"
-                        incomeData={mockIncomeData.datasets[0].data}
-                        expenditureData={mockExpenditureData.datasets[0].data}
-                        labels={mockIncomeData.labels}
-                    />
+                    {isExpenditureDataLoaded && isIncomeDataLoaded ? (
+                        <DoughnutChart
+                            title="Cash Flow"
+                            incomeData={incomeData.data}
+                            expenditureData={expenditureData.data}
+                            labels={expenditureData.labels}
+                        />
+                    ) : (
+                        <p>Loading cash flow data</p>
+                    )}
                 </div>
-
             </div>
         </div>
     );
