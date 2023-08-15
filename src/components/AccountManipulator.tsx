@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import "./AccountManipulator.css";
 import {useDispatch} from "react-redux";
 import {loadAccountType, loadAction} from "../actions";
+import ModalComponent from "./AccountModal";
 
 const actions = {
     ADD: "Add",
@@ -19,6 +20,7 @@ function AccountManipulator() {
     const dispatch = useDispatch();
     const [action, setAction] = useState<string>(actions.ADD);
     const [accountType, setAccountType] = useState<string>(accountTypes.CASH);
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
     const handleActionChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
         setAction(event.target.value);
@@ -31,6 +33,11 @@ function AccountManipulator() {
     const handleSelect = () => {
         dispatch(loadAction(action));
         dispatch(loadAccountType(accountType));
+        setIsModalOpen(true);
+    };
+
+    const closeModal = () => {
+        setIsModalOpen(false);
     };
 
     return (
@@ -53,6 +60,12 @@ function AccountManipulator() {
                 </div>
                 <div>
                     <button className="select-button" onClick={handleSelect}>Select</button>
+                    <ModalComponent
+                        isOpen={isModalOpen}
+                        closeModal={closeModal}
+                        action={action}
+                        accountType={accountType}
+                    />
                 </div>
             </div>
         </div>

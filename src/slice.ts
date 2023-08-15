@@ -1,4 +1,4 @@
-import { createSlice } from '@reduxjs/toolkit';
+import {createSlice, PayloadAction} from '@reduxjs/toolkit';
 import expenditureData from './expenditure.json';
 import incomeData from './income.json';
 
@@ -11,11 +11,22 @@ export const expenditureDataSlice = createSlice({
         loadExpenditureData: (state, action) => {
             return action.payload;
         },
+        updateExpenditureData: (state, action: PayloadAction<{ name: string; amount: number }>) => {
+            const { name, amount } = action.payload;
+            const index = state.labels.findIndex(label => label === name);
+            if (index !== -1) {
+                state.data[index] += amount;
+            }
+            else {
+                state.labels.push(name);
+                state.data.push(amount);
+            }
+        },
     },
     initialState: initialStateExpenditure
 });
 
-export const { loadExpenditureData } = expenditureDataSlice.actions;
+export const { loadExpenditureData, updateExpenditureData } = expenditureDataSlice.actions;
 
 export const incomeDataSlice = createSlice({
     name: 'incomeData',
@@ -23,11 +34,22 @@ export const incomeDataSlice = createSlice({
         loadIncomeData: (state, action) => {
             return action.payload;
         },
+        updateIncomeData: (state, action: PayloadAction<{ name: string; amount: number }>) => {
+            const { name, amount } = action.payload;
+            const index = state.labels.findIndex(label => label === name);
+            if (index !== -1) {
+                state.data[index] += amount;
+            }
+            else {
+                state.labels.push(name);
+                state.data.push(amount);
+            }
+        },
     },
     initialState: initialStateIncome
 });
 
-export const { loadIncomeData } = incomeDataSlice.actions;
+export const { loadIncomeData, updateIncomeData } = incomeDataSlice.actions;
 
 export const manipulateActionSlice = createSlice({
     name: 'manipulateAction',
