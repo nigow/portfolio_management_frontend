@@ -14,6 +14,7 @@ import {
 } from "chart.js";
 import 'chart.js/auto'
 import CashFlow from "./components/CashFlow";
+import AccountManipulator from "./components/AccountManipulator"
 
 ChartJS.register(
     CategoryScale,
@@ -55,12 +56,13 @@ function App() {
             <FoldableSidebar items={sidebarItems} />
             <div className="main-panel">
                 <h2>Portfolio Management System</h2>
-                <h3>Net Worth</h3>
                 <div className="stack">
+                    <h3>Net Worth</h3>
                     <div className="chart-container">
                         <Line data={mockNetWorthData} options={{ maintainAspectRatio: false }} />
                     </div>
                     <CashFlow />
+                    <AccountManipulator />
                 </div>
             </div>
         </div>

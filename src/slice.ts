@@ -29,3 +29,22 @@ export const incomeDataSlice = createSlice({
 
 export const { loadIncomeData } = incomeDataSlice.actions;
 
+export const manipulateActionSlice = createSlice({
+    name: 'manipulateAction',
+    reducers: {
+        loadIncomeData: (state, action) => {
+            return action.payload;
+        },
+    },
+    initialState: {},
+});
+
+export const manipulateAccountTypeSlice = createSlice({
+    name: 'accountType',
+    reducers: {
+        loadIncomeData: (state, action) => {
+            return action.payload;
+        },
+    },
+    initialState: {},
+});
