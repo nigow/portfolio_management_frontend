@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import "./AccountManipulator.css";
 import {useDispatch} from "react-redux";
-import {loadAccountType, loadAction} from "../actions";
+import {loadAccountType, loadAction} from "../redux/actions";
 import ModalComponent from "./AccountModal";
 import { accountActions, accountTypes } from "../constants";
 

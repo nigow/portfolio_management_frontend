@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import Modal from "react-modal";
 import "./AccountModal.css";
 import {useDispatch} from "react-redux";
-import {updateAccountData, updateExpenditureData, updateIncomeData} from "../slice";
+import {updateAccountData, updateExpenditureData, updateIncomeData} from "../redux/slice";
 
 interface AccountModalProps {
     isOpen: boolean;

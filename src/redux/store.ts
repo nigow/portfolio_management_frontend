@@ -8,8 +8,8 @@ import {
     manipulateAccountTypeSlice,
     manipulateActionSlice
 } from "./slice";
-import expenditureData from './expenditure.json';
-import incomeData from './income.json';
+import expenditureData from '../json/expenditure.json';
+import incomeData from '../json/income.json';
 
 const loadInitialExpenditureData = createAsyncThunk(
     'expenditureData/loadInitialData',

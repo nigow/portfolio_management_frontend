@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import './TableOverview.css';
-import stockData from './../stockData.json';
+import stockData from '../json/stockData.json';
 import axios from "axios";
 
 interface CompanyData {
