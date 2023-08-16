@@ -1,22 +1,34 @@
 import React, { useState } from 'react';
 import './FoldableSidebar.css';
+import { useSelector } from "react-redux";
 
-interface SidebarItem {
+interface AccountItem {
+    name: string;
+    amount: number;
+}
+
+interface AccountBundle {
     title: string;
-    items: { name: string; amount: string }[];
+    items: AccountItem[];
 }
 
-interface FoldableSidebarProps {
-    totalNetWorth: string;
-    accountData: SidebarItem[];
-    updateAccountItem: (payload: { title: string; updatedItem: { name: string; amount: number } }) => void;
-}
+const FoldableSidebar: React.FC = () => {
+    const accountData: AccountBundle[] = useSelector((state: {accountData: any}) => state.accountData);
 
-const FoldableSidebar: React.FC<FoldableSidebarProps> = ({ accountData, updateAccountItem, totalNetWorth }) => {
     const [expandedItem, setExpandedItem] = useState<string | null>(null);
 
     const handleItemClick = (title: string) => {
         setExpandedItem(prevExpandedItem => (prevExpandedItem === title ? null : title));
+    };
+
+    const calculateTotalNetWorth = () => {
+        let totalNetWorth = 0;
+        accountData.forEach((account: { items: any[]; }) => {
+            account.items.forEach(item => {
+                totalNetWorth += item.amount;
+            });
+        });
+        return totalNetWorth.toFixed(2);
     };
 
     return (
@@ -42,7 +54,7 @@ const FoldableSidebar: React.FC<FoldableSidebarProps> = ({ accountData, updateAc
             ))}
             <div className="total-net-worth">
                 <span>Total Net Worth:</span>
-                <span className="net-worth-amount">${totalNetWorth}</span>
+                <span className="net-worth-amount">${calculateTotalNetWorth()}</span>
             </div>
         </div>
     );
