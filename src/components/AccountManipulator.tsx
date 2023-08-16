@@ -3,22 +3,12 @@ import "./AccountManipulator.css";
 import {useDispatch} from "react-redux";
 import {loadAccountType, loadAction} from "../actions";
 import ModalComponent from "./AccountModal";
+import { accountActions, accountTypes } from "../constants";
 
-const actions = {
-    ADD: "Add",
-    MODIFY: "Modify",
-    DELETE: "Delete",
-};
-
-const accountTypes = {
-    CASH: "Cash",
-    EQUITY: "Equity",
-    BOND: "Bond",
-};
 
 function AccountManipulator() {
     const dispatch = useDispatch();
-    const [action, setAction] = useState<string>(actions.ADD);
+    const [action, setAction] = useState<string>(accountActions.ADD);
     const [accountType, setAccountType] = useState<string>(accountTypes.CASH);
     const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -46,16 +36,15 @@ function AccountManipulator() {
             <div className="dropdowns">
                 <div className="dropdown">
                     <select id="actionDropdown" value={action} onChange={handleActionChange}>
-                        <option value={actions.ADD}>Add</option>
-                        <option value={actions.MODIFY}>Modify</option>
-                        <option value={actions.DELETE}>Delete</option>
+                        <option value={accountActions.ADD}>Add</option>
+                        <option value={accountActions.MODIFY}>Modify</option>
+                        <option value={accountActions.DELETE}>Delete</option>
                     </select>
                 </div>
                 <div className="dropdown">
                     <select id="accountTypeDropdown" value={accountType} onChange={handleAccountTypeChange}>
                         <option value={accountTypes.CASH}>Cash</option>
-                        <option value={accountTypes.EQUITY}>Equities</option>
-                        <option value={accountTypes.BOND}>Bond</option>
+                        <option value={accountTypes.STOCK}>Stock</option>
                     </select>
                 </div>
                 <div>
