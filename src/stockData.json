@@ -1,0 +1,139 @@
+[ {
+  "ticker" : "AAPL",
+  "companyName" : "Apple",
+  "price" : 102.0,
+  "lastDayPrice" : 105.0,
+  "percentChange" : -2.86
+}, {
+  "ticker" : "AMZN",
+  "companyName" : "Amazon",
+  "price" : 108.0,
+  "lastDayPrice" : 101.0,
+  "percentChange" : 6.93
+}, {
+  "ticker" : "BRK.B",
+  "companyName" : "Berkshire Hathaway",
+  "price" : 95.0,
+  "lastDayPrice" : 107.0,
+  "percentChange" : -11.21
+}, {
+  "ticker" : "CGNX",
+  "companyName" : "Cognex Corp",
+  "price" : 22.0,
+  "lastDayPrice" : 18.0,
+  "percentChange" : 22.22
+}, {
+  "ticker" : "CMG",
+  "companyName" : "Chipotle Mexican Grill",
+  "price" : 18.0,
+  "lastDayPrice" : 23.0,
+  "percentChange" : -21.74
+}, {
+  "ticker" : "COST",
+  "companyName" : "Costco Wholesale",
+  "price" : 97.0,
+  "lastDayPrice" : 90.0,
+  "percentChange" : 7.78
+}, {
+  "ticker" : "Disney",
+  "companyName" : "Walt Disney Co",
+  "price" : 105.0,
+  "lastDayPrice" : 95.0,
+  "percentChange" : 10.53
+}, {
+  "ticker" : "DOCU",
+  "companyName" : "DocuSign inc",
+  "price" : 15.0,
+  "lastDayPrice" : 15.0,
+  "percentChange" : 0.0
+}, {
+  "ticker" : "GME",
+  "companyName" : "GameStop Corp",
+  "price" : 21.0,
+  "lastDayPrice" : 16.0,
+  "percentChange" : 31.25
+}, {
+  "ticker" : "GOOG",
+  "companyName" : "Google",
+  "price" : 95.0,
+  "lastDayPrice" : 97.0,
+  "percentChange" : -2.06
+}, {
+  "ticker" : "IDXX",
+  "companyName" : "Idexx Laboratories",
+  "price" : 17.0,
+  "lastDayPrice" : 19.0,
+  "percentChange" : -10.53
+}, {
+  "ticker" : "KO",
+  "companyName" : "Coca Cola",
+  "price" : 98.0,
+  "lastDayPrice" : 95.0,
+  "percentChange" : 3.16
+}, {
+  "ticker" : "MCHP",
+  "companyName" : "Microchip Technology Inc",
+  "price" : 17.0,
+  "lastDayPrice" : 16.0,
+  "percentChange" : 6.25
+}, {
+  "ticker" : "NVAX",
+  "companyName" : "Novavax Inc.",
+  "price" : 4.0,
+  "lastDayPrice" : 6.0,
+  "percentChange" : -33.33
+}, {
+  "ticker" : "OWL",
+  "companyName" : "Big Owl Capital",
+  "price" : 21.0,
+  "lastDayPrice" : 16.0,
+  "percentChange" : 31.25
+}, {
+  "ticker" : "PRTS",
+  "companyName" : "CarParts.com Inc",
+  "price" : 3.0,
+  "lastDayPrice" : 5.0,
+  "percentChange" : -40.0
+}, {
+  "ticker" : "SCHW",
+  "companyName" : "Charles Schwab Corporation",
+  "price" : 99.0,
+  "lastDayPrice" : 96.0,
+  "percentChange" : 3.12
+}, {
+  "ticker" : "SLAB",
+  "companyName" : "Silicon Laboratories",
+  "price" : 24.0,
+  "lastDayPrice" : 18.0,
+  "percentChange" : 33.33
+}, {
+  "ticker" : "TSLA",
+  "companyName" : "Tesla",
+  "price" : 101.0,
+  "lastDayPrice" : 90.0,
+  "percentChange" : 12.22
+}, {
+  "ticker" : "TTD",
+  "companyName" : "The Trade Desk Inc",
+  "price" : 15.0,
+  "lastDayPrice" : 23.0,
+  "percentChange" : -34.78
+}, {
+  "ticker" : "WFC",
+  "companyName" : "Wells Fargo & Co",
+  "price" : 90.0,
+  "lastDayPrice" : 99.0,
+  "percentChange" : -9.09
+}, {
+  "ticker" : "WMT",
+  "companyName" : "Walmart Inc",
+  "price" : 105.0,
+  "lastDayPrice" : 107.0,
+  "percentChange" : -1.87
+}, {
+  "ticker" : "X",
+  "companyName" : "United States Steel Corporation",
+  "price" : 21.0,
+  "lastDayPrice" : 17.0,
+  "percentChange" : 23.53
+} ]
