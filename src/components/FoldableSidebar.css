@@ -26,3 +26,32 @@
     padding-left: 20px;
     margin-top: 5px;
 }
+
+.sub-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 5px 20px;
+    border-top: 1px solid #666;
+}
+
+.account-amount {
+    font-weight: bold;
+    color: #aaf;
+    margin-right: 1rem;
+}
+
+
+/*NET WORTH SECTION*/
+.total-net-worth {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    border-top: 1px solid #666;
+    font-weight: bold;
+}
+
+.net-worth-amount {
+    color: #aaf;
+}

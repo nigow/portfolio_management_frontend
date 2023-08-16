@@ -30,8 +30,10 @@ const AccountModal: React.FC<AccountModalProps> = ({ isOpen, closeModal, action,
 
     const handleSubmit = (event: React.FormEvent) => {
         event.preventDefault();
-        dispatch(updateIncomeData({ name: name, amount: parseFloat(amount) }));
-        dispatch(updateExpenditureData({ name: name, amount: parseFloat(amount) }));
+        const floatAmount = parseFloat(amount);
+        floatAmount > 0
+            ? dispatch(updateIncomeData({ name: name, amount: floatAmount }))
+            : dispatch(updateExpenditureData({ name: name, amount: - floatAmount }));
         closeModal();
     };
 
