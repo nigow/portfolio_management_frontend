@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import Modal from "react-modal";
 import "./AccountModal.css";
 import {useDispatch} from "react-redux";
-import {updateExpenditureData, updateIncomeData} from "../slice";
+import {updateAccountData, updateExpenditureData, updateIncomeData} from "../slice";
 
 interface AccountModalProps {
     isOpen: boolean;
@@ -34,6 +34,7 @@ const AccountModal: React.FC<AccountModalProps> = ({ isOpen, closeModal, action,
         floatAmount > 0
             ? dispatch(updateIncomeData({ name: name, amount: floatAmount }))
             : dispatch(updateExpenditureData({ name: name, amount: - floatAmount }));
+        dispatch(updateAccountData({title: "Cash", updatedItem: { name: name, amount: parseInt(amount) }}))
         closeModal();
     };
 

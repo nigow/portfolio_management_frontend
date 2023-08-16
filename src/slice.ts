@@ -1,9 +1,11 @@
 import {createSlice, PayloadAction} from '@reduxjs/toolkit';
 import expenditureData from './expenditure.json';
 import incomeData from './income.json';
+import accountData from './account.json'
 
 const initialStateExpenditure = expenditureData;
 const initialStateIncome = incomeData;
+const initialStateAccounts = accountData;
 
 export const expenditureDataSlice = createSlice({
     name: 'expenditureData',
@@ -70,3 +72,30 @@ export const manipulateAccountTypeSlice = createSlice({
     },
     initialState: {},
 });
+
+export const accountDataSlice = createSlice({
+    name: 'accountData',
+    reducers: {
+        updateAccountData: (state, action: PayloadAction<{ title: string; updatedItem: { name: string; amount: number } }>) => {
+            const { title, updatedItem } = action.payload;
+            const accountType = state.find(account => account.title === title);
+            if (accountType) {
+                const updatedAccountType = { ...accountType };
+                const itemIndex = updatedAccountType.items.findIndex(item => item.name === updatedItem.name);
+                if (itemIndex !== -1) {
+                    updatedAccountType.items[itemIndex].amount += updatedItem.amount;
+                } else {
+                    updatedAccountType.items.push(updatedItem);
+                }
+                const accountIndex = state.findIndex(account => account.title === title);
+                state[accountIndex] = updatedAccountType;
+            }
+        },
+        loadAccountData: (state, action) => {
+            return action.payload;
+        },
+    },
+    initialState: initialStateAccounts,
+});
+
+export const { updateAccountData, loadAccountData } = accountDataSlice.actions;

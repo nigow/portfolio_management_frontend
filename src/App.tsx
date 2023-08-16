@@ -15,6 +15,8 @@ import 'chart.js/auto'
 import CashFlow from "./components/CashFlow";
 import AccountManipulator from "./components/AccountManipulator"
 import TableOverview from "./components/TableOverview";
+import {useDispatch, useSelector} from "react-redux";
+import { updateAccountData } from './slice';
 
 ChartJS.register(
     CategoryScale,
@@ -26,40 +28,28 @@ ChartJS.register(
     Legend,
 );
 
-const sidebarItems = [
-    {
-        title: 'Cash',
-        items: [
-            { name: 'CitiBank', amount: '$5000' },
-            { name: 'JPMC', amount: '$3000' },
-            { name: 'Bank of America', amount: '$7000' },
-        ],
-    },
-    {
-        title: 'Investment Balance',
-        items: [
-            { name: 'Apple', amount: '$10000' },
-            { name: 'Tesla', amount: '$15000' },
-            { name: 'Meta', amount: '$8000' },
-        ],
-    },
-];
-
-const calculateTotalNetWorth = () => {
-    let totalNetWorth = 0;
-    sidebarItems.forEach(itemGroup => {
-        itemGroup.items.forEach(item => {
-            const amount = parseFloat(item.amount.replace('$', '').replace(',', ''));
-            totalNetWorth += amount;
-        });
-    });
-    return totalNetWorth.toFixed(2);
-};
-
 function App() {
+    const dispatch = useDispatch();
+
+    const accountData = useSelector((state: {accountData: any}) => state.accountData);
+
+    const calculateTotalNetWorth = () => {
+        let totalNetWorth = 0;
+        accountData.forEach((account: { items: any[]; }) => {
+            account.items.forEach(item => {
+                totalNetWorth += item.amount;
+            });
+        });
+        return totalNetWorth.toFixed(2);
+    };
+
     return (
         <div className="app-container">
-            <FoldableSidebar items={sidebarItems} totalNetWorth={calculateTotalNetWorth()} />
+            <FoldableSidebar
+                accountData={accountData}
+                updateAccountItem={payload => dispatch(updateAccountData(payload))}
+                totalNetWorth={calculateTotalNetWorth()}
+            />
             <div className="main-panel">
                 <h2>Portfolio Management System</h2>
                 <div className="stack">
