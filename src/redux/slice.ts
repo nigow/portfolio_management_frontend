@@ -1,11 +1,13 @@
 import {createSlice, PayloadAction} from '@reduxjs/toolkit';
 import expenditureData from '../json/expenditure.json';
 import incomeData from '../json/income.json';
-import accountData from '../json/account.json'
+import investmentData from '../json/investment.json';
+import cashData from '../json/cash.json';
 
 const initialStateExpenditure = expenditureData;
 const initialStateIncome = incomeData;
-const initialStateAccounts = accountData;
+const initialStateCash = cashData;
+const initialStateInvestment = investmentData;
 
 export const expenditureDataSlice = createSlice({
     name: 'expenditureData',
@@ -73,29 +75,53 @@ export const manipulateAccountTypeSlice = createSlice({
     initialState: {},
 });
 
-export const accountDataSlice = createSlice({
-    name: 'accountData',
+interface AccountAction {
+    name: string;
+    amount: number;
+}
+
+export const cashSlice = createSlice({
+    name: 'cashData',
+    initialState: initialStateCash,
     reducers: {
-        updateAccountData: (state, action: PayloadAction<{ title: string; updatedItem: { name: string; amount: number } }>) => {
-            const { title, updatedItem } = action.payload;
-            const accountType = state.find(account => account.title === title);
-            if (accountType) {
-                const updatedAccountType = { ...accountType };
-                const itemIndex = updatedAccountType.items.findIndex(item => item.name === updatedItem.name);
-                if (itemIndex !== -1) {
-                    updatedAccountType.items[itemIndex].amount += updatedItem.amount;
-                } else {
-                    updatedAccountType.items.push(updatedItem);
-                }
-                const accountIndex = state.findIndex(account => account.title === title);
-                state[accountIndex] = updatedAccountType;
+        updateCashData: (state, action: PayloadAction<AccountAction>) => {
+            const { name, amount } = action.payload;
+            const foundItem = state.find(item => item.name === name);
+            if (foundItem) {
+                foundItem.amount += amount;
+            } else {
+                const id = 4; // TODO: do not hardcode it
+                state.push({ name, amount, id });
             }
         },
-        loadAccountData: (state, action) => {
+        loadCashData: (state, action) => {
             return action.payload;
         },
     },
-    initialState: initialStateAccounts,
 });
 
-export const { updateAccountData, loadAccountData } = accountDataSlice.actions;
+export const { updateCashData, loadCashData } = cashSlice.actions;
+
+
+export const investmentSlice = createSlice({
+    name: 'investmentData',
+    initialState: initialStateInvestment,
+    reducers: {
+        updateInvestmentData: (state, action: PayloadAction<AccountAction>) => {
+            const { name, amount } = action.payload;
+            const foundItem = state.find(item => item.name === name);
+            if (foundItem) {
+                foundItem.amount += amount;
+            } else {
+                const id = 4; // TODO: do not hardcode it
+                state.push({ name, amount, id });
+            }
+        },
+        loadInvestmentData: (state, action) => {
+            return action.payload;
+        },
+    },
+});
+
+export const { updateInvestmentData, loadInvestmentData } = investmentSlice.actions;
+

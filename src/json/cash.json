@@ -1,0 +1,5 @@
+[
+  { "id": 1, "name": "CitiBank", "amount": 5000 },
+  { "id": 2, "name": "JPMC", "amount": 3000 },
+  { "id": 3, "name": "Bank of America", "amount": 7000 }
+]

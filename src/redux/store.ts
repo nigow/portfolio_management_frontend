@@ -1,8 +1,9 @@
 import {configureStore, createAsyncThunk} from '@reduxjs/toolkit';
 import {
-    accountDataSlice,
+    cashSlice,
     expenditureDataSlice,
     incomeDataSlice,
+    investmentSlice,
     loadExpenditureData,
     loadIncomeData,
     manipulateAccountTypeSlice,
@@ -31,7 +32,8 @@ const store = configureStore({
         incomeData: incomeDataSlice.reducer,
         manipulateActionSlice: manipulateActionSlice.reducer,
         manipulateAccountTypeSlice: manipulateAccountTypeSlice.reducer,
-        accountData: accountDataSlice.reducer
+        cashData: cashSlice.reducer,
+        investmentData: investmentSlice.reducer
     },
 });
 

@@ -7,13 +7,15 @@ interface AccountItem {
     amount: number;
 }
 
-interface AccountBundle {
-    title: string;
-    items: AccountItem[];
+interface CashAccount extends AccountItem {}
+
+interface InvestmentAccount extends AccountItem {
+    total: number;
 }
 
 const FoldableSidebar: React.FC = () => {
-    const accountData: AccountBundle[] = useSelector((state: {accountData: any}) => state.accountData);
+    const cashData = useSelector((state: {cashData: CashAccount[]}) => state.cashData);
+    const investmentData = useSelector((state: {investmentData: InvestmentAccount[]}) => state.investmentData);
 
     const [expandedItem, setExpandedItem] = useState<string | null>(null);
 
@@ -23,35 +25,53 @@ const FoldableSidebar: React.FC = () => {
 
     const calculateTotalNetWorth = () => {
         let totalNetWorth = 0;
-        accountData.forEach((account: { items: any[]; }) => {
-            account.items.forEach(item => {
-                totalNetWorth += item.amount;
-            });
+
+        cashData.forEach((item: CashAccount) => {
+            totalNetWorth += item.amount;
         });
+
+        investmentData.forEach((item: InvestmentAccount) => {
+            totalNetWorth += item.amount;
+        });
+
         return totalNetWorth.toFixed(2);
     };
 
     return (
         <div className="foldable-sidebar">
-            {accountData.map(item => (
-                <div
-                    key={item.title}
-                    className={`sidebar-item ${expandedItem === item.title ? 'expanded' : ''}`}
-                    onClick={() => handleItemClick(item.title)}
-                >
-                    <div className="sidebar-item-title">{item.title}</div>
-                    {expandedItem === item.title && (
-                        <ul className="sub-items">
-                            {item.items.map(subItem => (
-                                <li key={subItem.name} className="sub-item">
-                                    <span>{subItem.name}</span>
-                                    <span className="account-amount">${subItem.amount}</span>
-                                </li>
-                            ))}
-                        </ul>
-                    )}
-                </div>
-            ))}
+            <div
+                className={`sidebar-item ${expandedItem === 'Cash' ? 'expanded' : ''}`}
+                onClick={() => handleItemClick('Cash')}
+            >
+                <div className="sidebar-item-title">Cash</div>
+                {expandedItem === 'Cash' && (
+                    <ul className="sub-items">
+                        {cashData.map((item: CashAccount) => (
+                            <li key={item.name} className="sub-item">
+                                <span>{item.name}</span>
+                                <span className="account-amount">${item.amount}</span>
+                            </li>
+                        ))}
+                    </ul>
+                )}
+            </div>
+            <div
+                className={`sidebar-item ${expandedItem === 'Investment Account' ? 'expanded' : ''}`}
+                onClick={() => handleItemClick('Investment Account')}
+            >
+                <div className="sidebar-item-title">Investment Account</div>
+                {expandedItem === 'Investment Account' && (
+                    <ul className="sub-items">
+                        {investmentData.map((item: InvestmentAccount) => (
+                            <li key={item.name} className="sub-item">
+                                <span>{item.name}</span>
+                                <span className="account-amount">${item.amount}</span>
+                            </li>
+                        ))}
+                    </ul>
+                )}
+            </div>
+
             <div className="total-net-worth">
                 <span>Total Net Worth:</span>
                 <span className="net-worth-amount">${calculateTotalNetWorth()}</span>
