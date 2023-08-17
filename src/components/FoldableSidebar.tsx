@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import './FoldableSidebar.css';
-import { useSelector } from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
+import {fetchInitialCashData, loadCashData} from "../redux/slice";
 
 interface AccountItem {
     name: string;
@@ -36,6 +37,21 @@ const FoldableSidebar: React.FC = () => {
 
         return totalNetWorth.toFixed(2);
     };
+
+    const dispatch = useDispatch();
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                // @ts-ignore
+                const data = await dispatch(fetchInitialCashData()).unwrap();
+                dispatch(loadCashData(data));
+            } catch (error) {
+                console.error(error);
+            }
+        };
+        fetchData();
+    }, [dispatch]);
 
     return (
         <div className="foldable-sidebar">

@@ -1,12 +1,10 @@
-import {createSlice, PayloadAction} from '@reduxjs/toolkit';
+import {createAsyncThunk, createSlice, PayloadAction} from '@reduxjs/toolkit';
 import expenditureData from '../json/expenditure.json';
 import incomeData from '../json/income.json';
 import investmentData from '../json/investment.json';
-import cashData from '../json/cash.json';
 
 const initialStateExpenditure = expenditureData;
 const initialStateIncome = incomeData;
-const initialStateCash = cashData;
 const initialStateInvestment = investmentData;
 
 export const expenditureDataSlice = createSlice({
@@ -75,24 +73,52 @@ export const manipulateAccountTypeSlice = createSlice({
     initialState: {},
 });
 
+export const fetchInitialCashData = createAsyncThunk<CashItem[], void>(
+    'cashData/fetchInitialCashData',
+    async (_, thunkAPI) => {
+        try {
+            const response = await fetch(`${process.env.REACT_APP_ENDPOINT}/cash`);
+            const data: CashItem[] = await response.json();
+
+            const mappedData = data.map(item => ({
+                ...item,
+                amount: item.balance,
+            }));
+
+            return mappedData;
+        } catch (error) {
+            return thunkAPI.rejectWithValue(error);
+        }
+    }
+);
+
 interface AccountAction {
     name: string;
     amount: number;
 }
 
+interface CashItem {
+    id: number;
+    name: string;
+    balance: number;
+}
+
+const cashInitialState: CashItem[] = [];
+
 export const cashSlice = createSlice({
     name: 'cashData',
-    initialState: initialStateCash,
+    initialState: cashInitialState,
     reducers: {
         updateCashData: (state, action: PayloadAction<AccountAction>) => {
             const { name, amount } = action.payload;
             const foundItem = state.find(item => item.name === name);
             if (foundItem) {
-                foundItem.amount += amount;
-            } else {
-                const id = 4; // TODO: do not hardcode it
-                state.push({ name, amount, id });
+                foundItem.balance += amount;
             }
+            // else {
+            //     const id = 4; // TODO: do not hardcode it
+            //     state.push({ name, balance, id });
+            // }
         },
         loadCashData: (state, action) => {
             return action.payload;
