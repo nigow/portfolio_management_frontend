@@ -1,4 +1,4 @@
-import {createAsyncThunk, createSlice, PayloadAction} from '@reduxjs/toolkit';
+import {createAsyncThunk, createSelector, createSlice, PayloadAction} from '@reduxjs/toolkit';
 import expenditureData from '../json/expenditure.json';
 import incomeData from '../json/income.json';
 import investmentData from '../json/investment.json';
@@ -114,12 +114,29 @@ export const updateCashData = createAsyncThunk(
         formData.append('name', name);
         formData.append('change', balance.toString());
 
-        const response = await axios.post('http://localhost:8080/api/v1/cash/create', formData, {
+        const response = await axios.post(`${process.env.REACT_APP_ENDPOINT}/cash/create`, formData, {
             headers: {
                 'Content-Type': 'multipart/form-data',
             },
         });
 
+        return response.data;
+    }
+);
+
+export const deleteCashData = createAsyncThunk(
+    'cashData/deleteCashData',
+    async (data: CashAction) => {
+        const { name } = data;
+        const formData = new FormData();
+        formData.append('name', name);
+
+        const response = await axios.delete(`${process.env.REACT_APP_ENDPOINT}/cash/delete`, {
+            data: formData,
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            },
+        });
         return response.data;
     }
 );
@@ -146,8 +163,17 @@ export const cashSlice = createSlice({
                 state.push({ id, name, amount: balance });
             }
         });
+        builder.addCase(deleteCashData.fulfilled, (state, action) => {
+            const name = action.payload;
+            const foundItemIndex = state.findIndex((item) => item.name === name);
+            if (foundItemIndex !== -1) {
+                state.splice(foundItemIndex, 1)
+            }
+        });
     },
 });
+
+export const selectCashData = (state: { cashData: any; }) => state.cashData;
 
 export const {  loadCashData } = cashSlice.actions;
 

@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 import Modal from "react-modal";
 import "./AccountModal.css";
-import {useDispatch} from "react-redux";
-import {updateCashData, updateExpenditureData, updateIncomeData} from "../redux/slice";
+import {useDispatch, useSelector} from "react-redux";
+import {deleteCashData, selectCashData, updateCashData, updateExpenditureData, updateIncomeData} from "../redux/slice";
+import {accountActions, accountTypes} from "../constants";
 
 interface AccountModalProps {
     isOpen: boolean;
@@ -13,10 +14,15 @@ interface AccountModalProps {
 
 const AccountModal: React.FC<AccountModalProps> = ({ isOpen, closeModal, action, accountType }) => {
     const dispatch = useDispatch();
+    const cashData = useSelector(selectCashData);
     const [name, setName] = useState("");
     const [amount, setAmount] = useState("");
 
     const handleNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setName(event.target.value);
+    };
+
+    const handleNameChangeSelect = (event: React.ChangeEvent<HTMLSelectElement>) => {
         setName(event.target.value);
     };
 
@@ -31,15 +37,32 @@ const AccountModal: React.FC<AccountModalProps> = ({ isOpen, closeModal, action,
     const handleSubmit = async (event: React.FormEvent) => {
         event.preventDefault();
         const floatAmount = parseFloat(amount);
-        floatAmount > 0
-            ? dispatch(updateIncomeData({ name: name, amount: floatAmount }))
-            : dispatch(updateExpenditureData({ name: name, amount: -floatAmount }));
-        try {
-            // @ts-ignore
-            dispatch(updateCashData({name: name, balance: parseInt(amount)}));
-        } catch (error) {
-            console.error(error);
+        if (accountType === accountTypes.CASH) {
+            switch (action) {
+                case accountActions.ADD:
+                    floatAmount > 0
+                        ? dispatch(updateIncomeData({ name: name, amount: floatAmount }))
+                        : dispatch(updateExpenditureData({ name: name, amount: -floatAmount }));
+                    try {
+                        // @ts-ignore
+                        dispatch(updateCashData({name: name, balance: parseInt(amount)}));
+                    } catch (error) {
+                        console.error(error);
+                    }
+                    break;
+                case accountActions.DELETE:
+                    // @ts-ignore
+                    dispatch(deleteCashData({name: name}));
+                    break;
+                default:
+                    // TODO
+                    break;
+            }
         }
+        else {
+            // TODO
+        }
+
         closeModal();
     };
 
@@ -48,7 +71,7 @@ const AccountModal: React.FC<AccountModalProps> = ({ isOpen, closeModal, action,
         <Modal isOpen={isOpen} onRequestClose={closeModal}>
             <h2>{action} - {accountType}</h2>
             <form onSubmit={handleSubmit}>
-                {action === "Add" && accountType === "Cash" && (
+                {action === accountActions.ADD && accountType === accountTypes.CASH && (
                     <>
                         <div>
                             <label>Name of new cash account:</label>
@@ -59,6 +82,19 @@ const AccountModal: React.FC<AccountModalProps> = ({ isOpen, closeModal, action,
                             <input type="text" value={amount} onChange={handleAmountChange} />
                         </div>
                     </>
+                )}
+                {action === accountActions.DELETE && accountType === accountTypes.CASH && (
+                    <div>
+                        <label>Select an account to delete:</label>
+                        <select value={name} onChange={handleNameChangeSelect}>
+                            <option value="">Select an account</option>
+                            {cashData.map((account: {id: number; amount: number; name: string;}) => (
+                                <option key={account.id} value={account.name}>
+                                    {account.name}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
                 )}
                 <div className="button-container">
                     <button type="submit">Submit</button>
