@@ -1,4 +1,5 @@
 import {configureStore, createAsyncThunk} from '@reduxjs/toolkit';
+import thunk from 'redux-thunk';
 import {
     cashSlice,
     expenditureDataSlice,
@@ -12,14 +13,14 @@ import {
 import expenditureData from '../json/expenditure.json';
 import incomeData from '../json/income.json';
 
-const loadInitialExpenditureData = createAsyncThunk(
+export const loadInitialExpenditureData = createAsyncThunk(
     'expenditureData/loadInitialData',
     async (_, { dispatch }) => {
         dispatch(loadExpenditureData(expenditureData));
     }
 );
 
-const loadInitialIncomeData = createAsyncThunk(
+export const loadInitialIncomeData = createAsyncThunk(
     'expenditureData/loadInitialData',
     async (_, { dispatch }) => {
         dispatch(loadIncomeData(incomeData));
@@ -35,9 +36,7 @@ const store = configureStore({
         cashData: cashSlice.reducer,
         investmentData: investmentSlice.reducer
     },
+    middleware: [thunk],
 });
-
-store.dispatch(loadInitialExpenditureData);
-store.dispatch(loadInitialIncomeData);
 
 export default store;
