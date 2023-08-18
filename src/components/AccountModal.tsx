@@ -34,7 +34,7 @@ const AccountModal: React.FC<AccountModalProps> = ({ isOpen, closeModal, action,
         floatAmount > 0
             ? dispatch(updateIncomeData({ name: name, amount: floatAmount }))
             : dispatch(updateExpenditureData({ name: name, amount: - floatAmount }));
-        dispatch(updateCashData({name: name, amount: parseInt(amount)}))
+        dispatch(updateCashData({name: name, balance: parseInt(amount)}))
         closeModal();
     };
 

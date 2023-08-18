@@ -92,9 +92,9 @@ export const fetchInitialCashData = createAsyncThunk<CashItem[], void>(
     }
 );
 
-interface AccountAction {
+interface CashAction {
     name: string;
-    amount: number;
+    balance: number;
 }
 
 interface CashItem {
@@ -109,16 +109,16 @@ export const cashSlice = createSlice({
     name: 'cashData',
     initialState: cashInitialState,
     reducers: {
-        updateCashData: (state, action: PayloadAction<AccountAction>) => {
-            const { name, amount } = action.payload;
+        updateCashData: (state, action: PayloadAction<CashAction>) => {
+            const { name, balance } = action.payload;
             const foundItem = state.find(item => item.name === name);
             if (foundItem) {
-                foundItem.balance += amount;
+                foundItem.balance += balance;
             }
-            // else {
-            //     const id = 4; // TODO: do not hardcode it
-            //     state.push({ name, balance, id });
-            // }
+            else {
+                const id = 4; // TODO: do not hardcode it
+                state.push({ name, balance, id });
+            }
         },
         loadCashData: (state, action) => {
             return action.payload;
@@ -128,12 +128,23 @@ export const cashSlice = createSlice({
 
 export const { updateCashData, loadCashData } = cashSlice.actions;
 
+interface InvestmentAction {
+    name: string;
+    amount: number;
+}
+
+interface InvestmentItem {
+    id: number;
+    name: string;
+    balance: number;
+}
+
 
 export const investmentSlice = createSlice({
     name: 'investmentData',
     initialState: initialStateInvestment,
     reducers: {
-        updateInvestmentData: (state, action: PayloadAction<AccountAction>) => {
+        updateInvestmentData: (state, action: PayloadAction<InvestmentAction>) => {
             const { name, amount } = action.payload;
             const foundItem = state.find(item => item.name === name);
             if (foundItem) {
