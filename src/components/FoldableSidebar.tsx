@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import './FoldableSidebar.css';
 import {useDispatch, useSelector} from "react-redux";
-import {fetchInitialCashData, loadCashData} from "../redux/slice";
+import {fetchInitialCashData, fetchInitialInvestmentData, loadCashData, loadInvestmentData} from "../redux/slice";
 
 interface AccountItem {
     name: string;
@@ -10,8 +10,10 @@ interface AccountItem {
 
 interface CashAccount extends AccountItem {}
 
-interface InvestmentAccount extends AccountItem {
-    total: number;
+interface InvestmentAccount  {
+    ticker: string;
+    amountOwned: number;
+    costBasis: number;
 }
 
 const FoldableSidebar: React.FC = () => {
@@ -32,7 +34,7 @@ const FoldableSidebar: React.FC = () => {
         });
 
         investmentData.forEach((item: InvestmentAccount) => {
-            totalNetWorth += item.amount;
+            totalNetWorth += item.amountOwned * item.costBasis;
         });
 
         return totalNetWorth.toFixed(2);
@@ -44,8 +46,12 @@ const FoldableSidebar: React.FC = () => {
         const fetchData = async () => {
             try {
                 // @ts-ignore
-                const data = await dispatch(fetchInitialCashData()).unwrap();
-                dispatch(loadCashData(data));
+                const cashData = await dispatch(fetchInitialCashData()).unwrap();
+                dispatch(loadCashData(cashData));
+
+                // @ts-ignore
+                const investmentData = await dispatch(fetchInitialInvestmentData()).unwrap();
+                dispatch(loadInvestmentData(investmentData));
             } catch (error) {
                 console.error(error);
             }
@@ -79,9 +85,9 @@ const FoldableSidebar: React.FC = () => {
                 {expandedItem === 'Investment Account' && (
                     <ul className="sub-items">
                         {investmentData.map((item: InvestmentAccount) => (
-                            <li key={item.name} className="sub-item">
-                                <span>{item.name}</span>
-                                <span className="account-amount">${item.amount}</span>
+                            <li key={item.ticker} className="sub-item">
+                                <span>{item.ticker}</span>
+                                <span className="account-amount">${item.amountOwned * item.costBasis}</span>
                             </li>
                         ))}
                     </ul>

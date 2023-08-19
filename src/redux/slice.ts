@@ -183,10 +183,24 @@ interface InvestmentAction {
 }
 
 interface InvestmentItem {
-    id: number;
-    name: string;
-    balance: number;
+    ticker: string;
+    amountOwned: number;
+    costBasis: number;
 }
+
+export const fetchInitialInvestmentData = createAsyncThunk<InvestmentItem[], void>(
+    'cashData/fetchInitialCashData',
+    async (_, thunkAPI) => {
+        try {
+            const response = await fetch(`${process.env.REACT_APP_ENDPOINT}/inventory/stock-owned/get/admin`);
+            const data: InvestmentItem[] = await response.json();
+
+            return data;
+        } catch (error) {
+            return thunkAPI.rejectWithValue(error);
+        }
+    }
+);
 
 
 export const investmentSlice = createSlice({
