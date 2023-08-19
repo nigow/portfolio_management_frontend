@@ -6,7 +6,7 @@ import axios from "axios";
 
 const initialStateExpenditure = expenditureData;
 const initialStateIncome = incomeData;
-const initialStateInvestment = investmentData;
+// const initialStateInvestment = investmentData;
 
 export const expenditureDataSlice = createSlice({
     name: 'expenditureData',
@@ -177,15 +177,14 @@ export const selectCashData = (state: { cashData: any; }) => state.cashData;
 
 export const {  loadCashData } = cashSlice.actions;
 
-interface InvestmentAction {
-    name: string;
-    amount: number;
-}
-
 interface InvestmentItem {
     ticker: string;
     amountOwned: number;
     costBasis: number;
+}
+
+interface InvestmentAction extends InvestmentItem{
+    buyOrSell: string;
 }
 
 export const fetchInitialInvestmentData = createAsyncThunk<InvestmentItem[], void>(
@@ -202,26 +201,52 @@ export const fetchInitialInvestmentData = createAsyncThunk<InvestmentItem[], voi
     }
 );
 
+export const updateInvestmentData = createAsyncThunk(
+    'cashData/updateInvestmentData',
+    async (data: InvestmentAction) => {
+        const { ticker, amountOwned, buyOrSell } = data;
+        const actionField = buyOrSell === "Buy" ? "sharesToBuy" : "sharesToSell"
+        const formData = {
+            "ticker": ticker,
+            "username": "admin"
+        }
+        // @ts-ignore
+        formData[actionField] = amountOwned;
+        const endpoint = `${process.env.REACT_APP_ENDPOINT}/inventory/${buyOrSell.toLowerCase()}`
+        await axios.post(endpoint, formData);
+        return {...data};
+    }
+);
+
+
+
 
 export const investmentSlice = createSlice({
     name: 'investmentData',
-    initialState: initialStateInvestment,
+    initialState: [],
     reducers: {
-        updateInvestmentData: (state, action: PayloadAction<InvestmentAction>) => {
-            const { name, amount } = action.payload;
-            const foundItem = state.find(item => item.name === name);
-            if (foundItem) {
-                foundItem.amount += amount;
-            } else {
-                const id = 4; // TODO: do not hardcode it
-                state.push({ name, amount, id });
-            }
-        },
         loadInvestmentData: (state, action) => {
             return action.payload;
         },
     },
+    extraReducers: (builder) => {
+        builder.addCase(updateInvestmentData.fulfilled, (state, action) => {
+            const { ticker, amountOwned, costBasis, buyOrSell } = action.payload;
+            const foundItemIndex = state.findIndex((item: InvestmentItem) => item.ticker === ticker);
+            const realAmountModified = buyOrSell == "Buy" ? amountOwned : -amountOwned;
+            if (foundItemIndex !== -1) {
+                // @ts-ignore
+                // @ts-ignore
+                state[foundItemIndex].amountOwned += realAmountModified;
+            }
+            else {
+                // @ts-ignore
+                state.push({ ticker, amountOwned, costBasis });
+            }
+        });
+    },
 });
 
-export const { updateInvestmentData, loadInvestmentData } = investmentSlice.actions;
+export const { loadInvestmentData } = investmentSlice.actions;
 
+export const selectInvestmentData = (state: { investmentData: InvestmentItem[]; }) => state.investmentData;

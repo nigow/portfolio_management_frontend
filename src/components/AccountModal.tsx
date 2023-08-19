@@ -1,9 +1,17 @@
-import React, { useState } from "react";
+import React, {useEffect, useState} from "react";
 import Modal from "react-modal";
 import "./AccountModal.css";
 import {useDispatch, useSelector} from "react-redux";
-import {deleteCashData, selectCashData, updateCashData, updateExpenditureData, updateIncomeData} from "../redux/slice";
+import {
+    deleteCashData,
+    selectCashData,
+    selectInvestmentData,
+    updateCashData,
+    updateExpenditureData,
+    updateIncomeData, updateInvestmentData
+} from "../redux/slice";
 import {accountActions, accountTypes} from "../constants";
+import axios from "axios";
 
 interface AccountModalProps {
     isOpen: boolean;
@@ -12,11 +20,36 @@ interface AccountModalProps {
     accountType: string;
 }
 
+interface CompanyData {
+    ticker: string;
+    companyName: string;
+    price: number;
+    lastDayPrice: number;
+    percentChange: number;
+}
+
+const buySellChoices = ["Buy", "Sell"];
+
+
 const AccountModal: React.FC<AccountModalProps> = ({ isOpen, closeModal, action, accountType }) => {
     const dispatch = useDispatch();
     const cashData = useSelector(selectCashData);
+    const investmentData = useSelector(selectInvestmentData)
     const [name, setName] = useState("");
-    const [amount, setAmount] = useState("");
+    const [amount, setAmount] = useState(0);
+    const [companyData, setCompanyData] = useState<CompanyData[]>([]);
+    const [buySell, setBuySell] = useState(buySellChoices[0]);
+    const [errorMessage, setErrorMessage] = useState("");
+
+    useEffect(() => {
+        axios.get(`${process.env.REACT_APP_ENDPOINT}/stocks`)
+            .then(response => {
+                setCompanyData(response.data);
+            })
+            .catch(error => {
+                console.error(error);
+            });
+    }, []);
 
     const handleNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setName(event.target.value);
@@ -27,22 +60,25 @@ const AccountModal: React.FC<AccountModalProps> = ({ isOpen, closeModal, action,
     };
 
     const handleAmountChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setAmount(event.target.value);
+        setAmount(parseInt(event.target.value));
     };
 
     const handleCancelButtonClick = () => {
         closeModal();
     };
 
+    const handleBuySellChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+        setBuySell(event.target.value);
+    };
+
     const handleSubmit = async (event: React.FormEvent) => {
         event.preventDefault();
-        const floatAmount = parseFloat(amount);
         if (accountType === accountTypes.CASH) {
             switch (action) {
                 case accountActions.ADD:
-                    floatAmount > 0
-                        ? dispatch(updateIncomeData({ name: name, amount: floatAmount }))
-                        : dispatch(updateExpenditureData({ name: name, amount: -floatAmount }));
+                    amount > 0
+                        ? dispatch(updateIncomeData({ name: name, amount: amount }))
+                        : dispatch(updateExpenditureData({ name: name, amount: -amount }));
                     try {
                         // @ts-ignore
                         dispatch(updateCashData({name: name, balance: parseInt(amount)}));
@@ -60,10 +96,36 @@ const AccountModal: React.FC<AccountModalProps> = ({ isOpen, closeModal, action,
             }
         }
         else {
-            // TODO
+            switch (action) {
+                case accountActions.DELETE:
+                    // TODO
+                    break;
+                default:
+                    let isError = false;
+                    investmentData.forEach(data => {
+                        if (data.ticker === name && data.amountOwned < amount && buySell === buySellChoices[1]) {
+                            setErrorMessage("You don't have sufficient stocks to sell");
+                            isError = true;
+                        }
+                    });
+                    if (!isError) {
+                        setErrorMessage("");
+                        const foundCompany = companyData.find(item => item.ticker === name);
+                        try {
+                            // @ts-ignore
+                            const costBasis = foundCompany.price;
+                            // @ts-ignore
+                            dispatch(updateInvestmentData({ticker: name, costBasis: costBasis, amountOwned: amount, buyOrSell: buySell}));
+                        }
+                        catch (error) {
+                            console.error(error);
+                        }
+                    }
+                    break;
+            }
         }
 
-        closeModal();
+        if (!errorMessage) closeModal();
     };
 
 
@@ -94,6 +156,32 @@ const AccountModal: React.FC<AccountModalProps> = ({ isOpen, closeModal, action,
                                 </option>
                             ))}
                         </select>
+                    </div>
+                )}
+                {action != accountActions.DELETE && accountType === accountTypes.STOCK && (
+                    <div>
+                        <label>Select a ticker</label>
+                        <select value={name} onChange={handleNameChangeSelect}>
+                            <option value="">Select an account</option>
+                            {companyData.map((account: CompanyData) => (
+                                <option key={account.ticker} value={account.ticker}>
+                                    {account.ticker}
+                                </option>
+                            ))}
+                        </select>
+                        <label>Buy or Sell?</label>
+                        <select value={buySell} onChange={handleBuySellChange}>
+                            {buySellChoices.map((decision: string) => (
+                                <option key={decision} value={decision}>
+                                    {decision}
+                                </option>
+                            ))}
+                        </select>
+                        <div>
+                            <label>Amount to {buySell.toLowerCase()}</label>
+                            <input type="text" value={amount} onChange={handleAmountChange} />
+                        </div>
+                        {errorMessage ? <label>{errorMessage}</label> : <></>}
                     </div>
                 )}
                 <div className="button-container">
