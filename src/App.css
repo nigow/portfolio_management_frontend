@@ -1,18 +1,14 @@
-/* App.css */
-
-/* Reset some default styles */
 body, margin, padding {
   margin: 0;
   padding: 0;
 }
 
-/* Container for the whole layout */
 .app-container {
   display: flex;
+  flex-wrap: wrap;
   height: 100vh;
 }
 
-/* Left sidebar */
 .sidebar {
   flex: 1;
   background-color: #333;
@@ -20,7 +16,6 @@ body, margin, padding {
   padding: 20px;
 }
 
-/* Main panel */
 .main-panel {
   flex: 3;
   background-color: #f4f4f4;
@@ -44,4 +39,16 @@ body, margin, padding {
 .stack {
   display: flex;
   flex-direction: column;
+}
+
+@media screen and (max-width: 700px) {
+  .sidebar {
+    flex: 100%;
+    padding: 10px;
+  }
+
+  .main-panel {
+    flex: 100%;
+    padding: 10px;
+  }
 }
