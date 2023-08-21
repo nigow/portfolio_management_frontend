@@ -2,6 +2,7 @@ import React, {useEffect, useState} from 'react';
 import './FoldableSidebar.css';
 import {useDispatch, useSelector} from "react-redux";
 import {fetchInitialCashData, fetchInitialInvestmentData, loadCashData, loadInvestmentData} from "../redux/slice";
+import InvestmentHistoryModal from "./InvestmentHistoryModal";
 
 interface AccountItem {
     name: string;
@@ -21,9 +22,20 @@ const FoldableSidebar: React.FC = () => {
     const investmentData = useSelector((state: {investmentData: InvestmentAccount[]}) => state.investmentData);
 
     const [expandedItem, setExpandedItem] = useState<string | null>(null);
+    const [selectedTicker, setSelectedTicker] = useState<string | null>(null);
+    const [showModal, setShowModal] = useState(false);
 
     const handleItemClick = (title: string) => {
         setExpandedItem(prevExpandedItem => (prevExpandedItem === title ? null : title));
+    };
+
+    const handleTickerClick = (ticker: string) => {
+        setSelectedTicker(ticker);
+        setShowModal(true);
+    };
+
+    const handleCloseModal = () => {
+        setShowModal(false);
     };
 
     const calculateTotalNetWorth = () => {
@@ -86,14 +98,21 @@ const FoldableSidebar: React.FC = () => {
                     <ul className="sub-items">
                         {investmentData.map((item: InvestmentAccount) => (
                             <li key={item.ticker} className="sub-item">
-                                <span>{item.ticker}</span>
+                            <span onClick={() => handleTickerClick(item.ticker)}>
+                                {item.ticker}
+                            </span>
                                 <span className="account-amount">${item.amountOwned * item.costBasis}</span>
                             </li>
                         ))}
                     </ul>
                 )}
             </div>
-
+            {showModal && selectedTicker && (
+                <InvestmentHistoryModal
+                    ticker={selectedTicker}
+                    onClose={handleCloseModal}
+                />
+            )}
             <div className="total-net-worth">
                 <span>Total Net Worth:</span>
                 <span className="net-worth-amount">${calculateTotalNetWorth()}</span>
