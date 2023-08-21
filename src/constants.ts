@@ -9,4 +9,9 @@ export const accountTypes = {
     STOCK: "Stock"
 };
 
+export const cashActions = {
+    DEPOSIT: "Deposit",
+    WITHDRAW: "Withdraw"
+}
+
 export {};

@@ -3,14 +3,13 @@ import Modal from "react-modal";
 import "./AccountModal.css";
 import {useDispatch, useSelector} from "react-redux";
 import {
-    deleteCashData,
     selectCashData,
     selectInvestmentData,
     updateCashData,
     updateExpenditureData,
     updateIncomeData, updateInvestmentData
 } from "../redux/slice";
-import {accountActions, accountTypes} from "../constants";
+import {accountActions, accountTypes, cashActions} from "../constants";
 import axios from "axios";
 
 interface AccountModalProps {
@@ -40,6 +39,7 @@ const AccountModal: React.FC<AccountModalProps> = ({ isOpen, closeModal, action,
     const [companyData, setCompanyData] = useState<CompanyData[]>([]);
     const [buySell, setBuySell] = useState(buySellChoices[0]);
     const [errorMessage, setErrorMessage] = useState("");
+    const [depositWithdraw, setDepositWithdraw] = useState(cashActions.DEPOSIT);
 
     useEffect(() => {
         axios.get(`${process.env.REACT_APP_ENDPOINT}/stocks`)
@@ -60,7 +60,9 @@ const AccountModal: React.FC<AccountModalProps> = ({ isOpen, closeModal, action,
     };
 
     const handleAmountChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setAmount(parseInt(event.target.value));
+        const parsed = parseInt(event.target.value);
+        const inputValue = isNaN(parsed) ? amount : parsed;
+        setAmount(inputValue);
     };
 
     const handleCancelButtonClick = () => {
@@ -71,27 +73,24 @@ const AccountModal: React.FC<AccountModalProps> = ({ isOpen, closeModal, action,
         setBuySell(event.target.value);
     };
 
+    const handleDepositWithdrawChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+        setDepositWithdraw(event.target.value);
+    };
+
     const handleSubmit = async (event: React.FormEvent) => {
         event.preventDefault();
         if (accountType === accountTypes.CASH) {
             switch (action) {
-                case accountActions.ADD:
+                case accountActions.DELETE:
+                    // @ts-ignore
+                    dispatch(updateCashData({name: name, action: action}));
+                    break;
+                default:
                     amount > 0
                         ? dispatch(updateIncomeData({ name: name, amount: amount }))
                         : dispatch(updateExpenditureData({ name: name, amount: -amount }));
-                    try {
-                        // @ts-ignore
-                        dispatch(updateCashData({name: name, balance: parseInt(amount)}));
-                    } catch (error) {
-                        console.error(error);
-                    }
-                    break;
-                case accountActions.DELETE:
                     // @ts-ignore
-                    dispatch(deleteCashData({name: name}));
-                    break;
-                default:
-                    // TODO
+                    dispatch(updateCashData({name: name, balance: parseInt(amount), action: action, cashAction: depositWithdraw}));
                     break;
             }
         }
@@ -156,6 +155,31 @@ const AccountModal: React.FC<AccountModalProps> = ({ isOpen, closeModal, action,
                                 </option>
                             ))}
                         </select>
+                    </div>
+                )}
+                {action === accountActions.MODIFY && accountType === accountTypes.CASH && (
+                    <div>
+                        <label>Select an account to modify:</label>
+                        <select value={name} onChange={handleNameChangeSelect}>
+                            <option value="">Select an account</option>
+                            {cashData.map((account: { id: number; amount: number; name: string; }) => (
+                                <option key={account.id} value={account.name}>
+                                    {account.name}
+                                </option>
+                            ))}
+                        </select>
+                        <label>Deposit or Withdraw?</label>
+                        <select value={depositWithdraw} onChange={handleDepositWithdrawChange}>
+                            {Object.values(cashActions).map((choice: string) => (
+                                <option key={choice} value={choice}>
+                                    {choice}
+                                </option>
+                            ))}
+                        </select>
+                        <div>
+                            <label>Amount to {depositWithdraw.toLowerCase()}:</label>
+                            <input type="text" value={amount} onChange={handleAmountChange} />
+                        </div>
                     </div>
                 )}
                 {action != accountActions.DELETE && accountType === accountTypes.STOCK && (

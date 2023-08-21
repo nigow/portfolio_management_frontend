@@ -1,12 +1,11 @@
-import {createAsyncThunk, createSelector, createSlice, PayloadAction} from '@reduxjs/toolkit';
+import {createAsyncThunk, createSlice, PayloadAction} from '@reduxjs/toolkit';
 import expenditureData from '../json/expenditure.json';
 import incomeData from '../json/income.json';
-import investmentData from '../json/investment.json';
 import axios from "axios";
+import {accountActions, cashActions} from "../constants";
 
 const initialStateExpenditure = expenditureData;
 const initialStateIncome = incomeData;
-// const initialStateInvestment = investmentData;
 
 export const expenditureDataSlice = createSlice({
     name: 'expenditureData',
@@ -95,7 +94,9 @@ export const fetchInitialCashData = createAsyncThunk<CashItem[], void>(
 
 interface CashAction {
     name: string;
-    balance: number;
+    action: typeof accountActions[keyof typeof accountActions];
+    balance?: number;
+    cashAction?: typeof cashActions[keyof typeof cashActions];
 }
 
 interface CashItem {
@@ -109,35 +110,40 @@ const cashInitialState: CashItem[] = [];
 export const updateCashData = createAsyncThunk(
     'cashData/updateCashData',
     async (data: CashAction) => {
-        const { name, balance } = data;
+        let { name, balance, action, cashAction } = data;
+        let endpoint = `${process.env.REACT_APP_ENDPOINT}`;
+        switch (action) {
+            case accountActions.ADD:
+                endpoint += "/cash/create";
+                break;
+            case accountActions.MODIFY:
+                endpoint += "/cash/total";
+                if (balance && cashAction === cashActions.WITHDRAW) balance = -balance;
+                break;
+            case accountActions.DELETE:
+                endpoint += "/cash/delete";
+                break;
+            default:
+                break;
+        }
+
         const formData = new FormData();
         formData.append('name', name);
-        formData.append('change', balance.toString());
+        if (balance) formData.append('change', balance.toString());
+        const response = action === accountActions.DELETE ?
+            await axios.delete(endpoint, {
+                data: formData,
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            }) :
+            await axios.post(endpoint, formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            });
 
-        const response = await axios.post(`${process.env.REACT_APP_ENDPOINT}/cash/create`, formData, {
-            headers: {
-                'Content-Type': 'multipart/form-data',
-            },
-        });
-
-        return response.data;
-    }
-);
-
-export const deleteCashData = createAsyncThunk(
-    'cashData/deleteCashData',
-    async (data: CashAction) => {
-        const { name } = data;
-        const formData = new FormData();
-        formData.append('name', name);
-
-        const response = await axios.delete(`${process.env.REACT_APP_ENDPOINT}/cash/delete`, {
-            data: formData,
-            headers: {
-                'Content-Type': 'multipart/form-data',
-            },
-        });
-        return response.data;
+        return {...response.data, accountAction: action};
     }
 );
 
@@ -152,30 +158,35 @@ export const cashSlice = createSlice({
     },
     extraReducers: (builder) => {
         builder.addCase(updateCashData.fulfilled, (state, action) => {
-            const { name, balance, id } = action.payload;
+            const { name, balance, id, accountAction } = action.payload;
             const foundItemIndex = state.findIndex((item) => item.name === name);
+            switch (accountAction) {
+                case accountActions.ADD:
+                    if (foundItemIndex === -1) {
+                        // @ts-ignore
+                        state.push({ id, name, amount: balance });
+                    }
+                    break;
+                case accountActions.MODIFY:
+                    if (foundItemIndex !== -1) {
+                        // @ts-ignore
+                        state[foundItemIndex].amount += balance;
+                    }
+                    break;
+                case accountActions.DELETE:
+                    if (foundItemIndex !== -1) state.splice(foundItemIndex, 1)
+                    break;
+                default:
+                    break;
+            }
 
-            if (foundItemIndex !== -1) {
-                // @ts-ignore
-                state[foundItemIndex].amount += balance;
-            } else {
-                // @ts-ignore
-                state.push({ id, name, amount: balance });
-            }
-        });
-        builder.addCase(deleteCashData.fulfilled, (state, action) => {
-            const name = action.payload;
-            const foundItemIndex = state.findIndex((item) => item.name === name);
-            if (foundItemIndex !== -1) {
-                state.splice(foundItemIndex, 1)
-            }
         });
     },
 });
 
 export const selectCashData = (state: { cashData: any; }) => state.cashData;
 
-export const {  loadCashData } = cashSlice.actions;
+export const { loadCashData } = cashSlice.actions;
 
 interface InvestmentItem {
     ticker: string;
@@ -217,9 +228,6 @@ export const updateInvestmentData = createAsyncThunk(
         return {...data};
     }
 );
-
-
-
 
 export const investmentSlice = createSlice({
     name: 'investmentData',
