@@ -143,6 +143,10 @@ export const updateCashData = createAsyncThunk(
                 },
             });
 
+        if (action === accountActions.MODIFY) {
+            return {name: name, balance: balance, accountAction: action}
+        }
+
         return {...response.data, accountAction: action};
     }
 );
