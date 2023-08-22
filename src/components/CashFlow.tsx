@@ -1,67 +1,48 @@
 import React, {useEffect} from 'react';
-import {
-    Chart as ChartJS,
-    CategoryScale,
-    LinearScale,
-    PointElement,
-    LineElement,
-    Title,
-    Tooltip,
-    Legend,
-} from "chart.js";
 import 'chart.js/auto'
 import DoughnutChart from './DoughnutChart';
 import {useDispatch, useSelector} from "react-redux";
-
-ChartJS.register(
-    CategoryScale,
-    LinearScale,
-    PointElement,
-    LineElement,
-    Title,
-    Tooltip,
-    Legend,
-);
-
-
-interface CashFlowData {
-    labels: string[];
-    data: number[];
-}
+import {
+    CashFlowItem,
+    fetchInitialCashFlowData,
+    loadExpenditureData,
+    loadIncomeData,
+} from "../redux/slice";
 
 function CashFlow() {
     const dispatch = useDispatch();
 
-    const expenditureData = useSelector((state: { expenditureData: CashFlowData }) => state.expenditureData);
-    const incomeData = useSelector((state: { incomeData: CashFlowData }) => state.incomeData);
-
-    const isExpenditureDataLoaded: boolean = useSelector((state: { expenditureData: CashFlowData }) => state.expenditureData.labels.length > 0);
-    const isIncomeDataLoaded: boolean = useSelector((state: { expenditureData: CashFlowData }) => state.expenditureData.labels.length > 0);
+    const expenditureData = useSelector(
+        (state: { expenditureData: CashFlowItem[] }) => state.expenditureData
+    );
+    const incomeData = useSelector(
+        (state: { incomeData: CashFlowItem[] }) => state.incomeData
+    );
 
     useEffect(() => {
-        if (!isExpenditureDataLoaded) {
-            dispatch({ type: 'expenditureData/loadInitialData', payload: expenditureData });
-        }
-        if (!isIncomeDataLoaded) {
-            dispatch({ type: 'incomeData/loadInitialData', payload: incomeData });
-        }
-    }, [dispatch, isExpenditureDataLoaded, isIncomeDataLoaded]);
+        const fetchData = async () => {
+            try {
+                // @ts-ignore
+                const result = await dispatch(fetchInitialCashFlowData()).unwrap();
+                dispatch(loadExpenditureData(result[0]));
+                dispatch(loadIncomeData(result[1]));
+            } catch (error) {
+                console.error(error);
+            }
+        };
+
+        fetchData();
+    }, [dispatch]);
 
     return (
         <div>
-            {isExpenditureDataLoaded && isIncomeDataLoaded ? (
-                <DoughnutChart
-                    title="Cash Flow"
-                    incomeData={incomeData.data}
-                    expenditureData={expenditureData.data}
-                    labels={expenditureData.labels}
-                />
-            ) : (
-                <p>Loading cash flow data</p>
-            )}
+            <DoughnutChart
+                title="Cash Flow"
+                incomeData={incomeData}
+                expenditureData={expenditureData}
+            />
         </div>
     );
 }
-
 
 export default CashFlow;

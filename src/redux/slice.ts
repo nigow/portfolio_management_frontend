@@ -1,11 +1,24 @@
 import {createAsyncThunk, createSlice, PayloadAction} from '@reduxjs/toolkit';
-import expenditureData from '../json/expenditure.json';
-import incomeData from '../json/income.json';
 import axios from "axios";
 import {accountActions, cashActions} from "../constants";
 
-const initialStateExpenditure = expenditureData;
-const initialStateIncome = incomeData;
+
+export interface CashFlowItem {
+    name: string;
+    balance: number;
+}
+
+export const fetchInitialCashFlowData = createAsyncThunk<CashItem[], void>(
+    'cashData/fetchInitialCashFlowData',
+    async (_, thunkAPI) => {
+        try {
+            const response = await fetch(`${process.env.REACT_APP_ENDPOINT}/cash/history`);
+            return await response.json();
+        } catch (error) {
+            return thunkAPI.rejectWithValue(error);
+        }
+    }
+);
 
 export const expenditureDataSlice = createSlice({
     name: 'expenditureData',
@@ -13,19 +26,20 @@ export const expenditureDataSlice = createSlice({
         loadExpenditureData: (state, action) => {
             return action.payload;
         },
-        updateExpenditureData: (state, action: PayloadAction<{ name: string; amount: number }>) => {
-            const { name, amount } = action.payload;
-            const index = state.labels.findIndex(label => label === name);
+        updateExpenditureData: (state, action: PayloadAction<CashFlowItem>) => {
+            const updatedItem = action.payload;
+            const index = state.findIndex(item => item.name === updatedItem.name);
             if (index !== -1) {
-                state.data[index] += amount;
-            }
-            else {
-                state.labels.push(name);
-                state.data.push(amount);
+                state[index] = {
+                    ...state[index],
+                    balance: state[index].balance + updatedItem.balance,
+                };
+            } else {
+                state.push(updatedItem);
             }
         },
     },
-    initialState: initialStateExpenditure
+    initialState: [] as CashFlowItem[],
 });
 
 export const { loadExpenditureData, updateExpenditureData } = expenditureDataSlice.actions;
@@ -36,19 +50,20 @@ export const incomeDataSlice = createSlice({
         loadIncomeData: (state, action) => {
             return action.payload;
         },
-        updateIncomeData: (state, action: PayloadAction<{ name: string; amount: number }>) => {
-            const { name, amount } = action.payload;
-            const index = state.labels.findIndex(label => label === name);
+        updateIncomeData: (state, action: PayloadAction<CashFlowItem>) => {
+            const updatedItem = action.payload;
+            const index = state.findIndex(item => item.name === updatedItem.name);
             if (index !== -1) {
-                state.data[index] += amount;
-            }
-            else {
-                state.labels.push(name);
-                state.data.push(amount);
+                state[index] = {
+                    ...state[index],
+                    balance: state[index].balance + updatedItem.balance,
+                };
+            } else {
+                state.push(updatedItem);
             }
         },
     },
-    initialState: initialStateIncome
+    initialState: [] as CashFlowItem[],
 });
 
 export const { loadIncomeData, updateIncomeData } = incomeDataSlice.actions;
@@ -107,6 +122,7 @@ interface CashItem {
 
 const cashInitialState: CashItem[] = [];
 
+// To deal with backend
 export const updateCashData = createAsyncThunk(
     'cashData/updateCashData',
     async (data: CashAction) => {
@@ -144,7 +160,7 @@ export const updateCashData = createAsyncThunk(
             });
 
         if (action === accountActions.MODIFY) {
-            return {name: name, balance: balance, accountAction: action}
+            return {...response.data, name: name, balance: balance, accountAction: action}
         }
 
         return {...response.data, accountAction: action};
@@ -152,6 +168,7 @@ export const updateCashData = createAsyncThunk(
 );
 
 
+// To deal with internal state management
 export const cashSlice = createSlice({
     name: 'cashData',
     initialState: cashInitialState,

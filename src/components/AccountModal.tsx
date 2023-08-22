@@ -85,12 +85,19 @@ const AccountModal: React.FC<AccountModalProps> = ({ isOpen, closeModal, action,
                     // @ts-ignore
                     dispatch(updateCashData({name: name, action: action}));
                     break;
-                default:
-                    amount > 0
-                        ? dispatch(updateIncomeData({ name: name, amount: amount }))
-                        : dispatch(updateExpenditureData({ name: name, amount: -amount }));
+                case accountActions.MODIFY:
                     // @ts-ignore
                     dispatch(updateCashData({name: name, balance: parseInt(amount), action: action, cashAction: depositWithdraw}));
+                    depositWithdraw === cashActions.WITHDRAW
+                        ? dispatch(updateExpenditureData({ name: name, balance: amount }))
+                        : dispatch(updateIncomeData({ name: name, balance: amount }))
+                    break;
+                case accountActions.ADD:
+                    // @ts-ignore
+                    dispatch(updateCashData({name: name, balance: parseInt(amount), action: action}));
+                    dispatch(updateIncomeData({ name: name, balance: amount }));
+                    break;
+                default:
                     break;
             }
         }

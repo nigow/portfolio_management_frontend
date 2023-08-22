@@ -1,17 +1,20 @@
 import React from 'react';
 import { Doughnut } from 'react-chartjs-2';
 import "./DoughnutChart.css"
+import { CashFlowItem } from "../redux/slice";
 
 interface DoughnutChartProps {
     title: string;
-    incomeData: number[];
-    expenditureData: number[];
-    labels: string[];
+    incomeData: CashFlowItem[];
+    expenditureData: CashFlowItem[];
 }
 
-const DoughnutChart: React.FC<DoughnutChartProps> = ({ title, incomeData, expenditureData, labels }) => {
-    const totalIncome = incomeData.reduce((a, b) => a + b, 0);
-    const totalExpenditure = expenditureData.reduce((a, b) => a + b, 0);
+const DoughnutChart: React.FC<DoughnutChartProps> = ({ title, incomeData, expenditureData }) => {
+    const totalIncome = incomeData.reduce((total, item) => total + item.balance, 0);
+    const totalExpenditure = expenditureData.reduce((total, item) => total + item.balance, 0);
+
+    const incomeLabels = incomeData.map(item => item.name);
+    const expenditureLabels = expenditureData.map(item => item.name);
 
     return (
         <div className="doughnut-chart">
@@ -20,10 +23,10 @@ const DoughnutChart: React.FC<DoughnutChartProps> = ({ title, incomeData, expend
                 <div className="doughnut">
                     <Doughnut
                         data={{
-                            labels,
+                            labels: incomeLabels,
                             datasets: [
                                 {
-                                    data: incomeData,
+                                    data: incomeData.map(item => item.balance),
                                     backgroundColor: ['Red', 'Blue', 'Green', 'Yellow'],
                                 },
                             ],
@@ -39,10 +42,10 @@ const DoughnutChart: React.FC<DoughnutChartProps> = ({ title, incomeData, expend
                 <div className="doughnut">
                     <Doughnut
                         data={{
-                            labels,
+                            labels: expenditureLabels,
                             datasets: [
                                 {
-                                    data: expenditureData,
+                                    data: expenditureData.map(item => item.balance),
                                     backgroundColor: ['Red', 'Blue', 'Green', 'Yellow'],
                                 },
                             ],
