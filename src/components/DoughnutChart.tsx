@@ -3,6 +3,19 @@ import { Doughnut } from 'react-chartjs-2';
 import "./DoughnutChart.css"
 import { CashFlowItem } from "../redux/slice";
 
+const generateRandomColors = (count: number) => {
+    const colors = [];
+    for (let _ = 0; _ < count; _++) {
+        const num = Math.round(0xffffff * Math.random());
+        const r = num >> 16;
+        const g = num >> 8 & 255;
+        const b = num & 255;
+        colors.push('rgb(' + r + ', ' + g + ', ' + b + ')');
+    }
+    return colors;
+};
+
+
 interface DoughnutChartProps {
     title: string;
     incomeData: CashFlowItem[];
@@ -16,6 +29,8 @@ const DoughnutChart: React.FC<DoughnutChartProps> = ({ title, incomeData, expend
     const incomeLabels = incomeData.map(item => item.name);
     const expenditureLabels = expenditureData.map(item => item.name);
 
+    const randomColors = generateRandomColors(Math.max(incomeData.length, expenditureData.length));
+
     return (
         <div className="doughnut-chart">
             <h3>{title}</h3>
@@ -27,12 +42,13 @@ const DoughnutChart: React.FC<DoughnutChartProps> = ({ title, incomeData, expend
                             datasets: [
                                 {
                                     data: incomeData.map(item => item.balance),
-                                    backgroundColor: ['Red', 'Blue', 'Green', 'Yellow'],
+                                    backgroundColor: randomColors,
                                 },
                             ],
                         }}
                         options={{
                             cutout: '65%',
+                            plugins: {legend: { display: false }}
                         }}
                         width={200}
                         height={200}
@@ -46,12 +62,13 @@ const DoughnutChart: React.FC<DoughnutChartProps> = ({ title, incomeData, expend
                             datasets: [
                                 {
                                     data: expenditureData.map(item => item.balance),
-                                    backgroundColor: ['Red', 'Blue', 'Green', 'Yellow'],
+                                    backgroundColor: randomColors,
                                 },
                             ],
                         }}
                         options={{
                             cutout: '65%',
+                            plugins: {legend: { display: false }}
                         }}
                         width={200}
                         height={200}
