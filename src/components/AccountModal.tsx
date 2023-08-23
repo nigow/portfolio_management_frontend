@@ -40,6 +40,7 @@ const AccountModal: React.FC<AccountModalProps> = ({ isOpen, closeModal, action,
     const [buySell, setBuySell] = useState(buySellChoices[0]);
     const [errorMessage, setErrorMessage] = useState("");
     const [depositWithdraw, setDepositWithdraw] = useState(cashActions.DEPOSIT);
+    const showSubmit = !(action === accountActions.DELETE && accountType === accountTypes.STOCK);
 
     useEffect(() => {
         axios.get(`${process.env.REACT_APP_ENDPOINT}/stocks`)
@@ -215,8 +216,13 @@ const AccountModal: React.FC<AccountModalProps> = ({ isOpen, closeModal, action,
                         {errorMessage ? <label>{errorMessage}</label> : <></>}
                     </div>
                 )}
+                {action === accountActions.DELETE && accountType === accountTypes.STOCK && (
+                    <div>
+                        <label>This functionality is currently unavailable</label>
+                    </div>
+                )}
                 <div className="button-container">
-                    <button type="submit">Submit</button>
+                    {showSubmit && <button type="submit">Submit</button>}
                     <button onClick={handleCancelButtonClick}>Cancel</button>
                 </div>
             </form>
