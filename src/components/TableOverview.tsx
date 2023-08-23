@@ -1,30 +1,49 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import './TableOverview.css';
-import stockData from '../json/stockData.json';
-import axios from "axios";
+import axios from 'axios';
 
 interface CompanyData {
     ticker: string;
     companyName: string;
+    marketCap: string;
     price: number;
     lastDayPrice: number;
-    percentChange: number;
+    volatileStock: string;
+    investorRating: string;
 }
+
+const toCamelCase = (input: string): string =>
+    input
+        .toLowerCase()
+        .replace(/[^a-zA-Z0-9]+(.)/g, (_, chr) => chr.toUpperCase());
+
 
 const TableOverview: React.FC = () => {
     const [companyData, setCompanyData] = useState<CompanyData[]>([]);
-    const endpoint = `${process.env.REACT_APP_ENDPOINT}/stocks`
+    const endpoint = `${process.env.REACT_APP_ENDPOINT}/stocks`;
+
     useEffect(() => {
-        axios.get(endpoint)
-            .then(response => {
+        axios
+            .get(endpoint)
+            .then((response) => {
                 setCompanyData(response.data);
             })
-            .catch(error => {
+            .catch((error) => {
                 console.error(error);
             });
     }, []);
 
-    const data = process.env.REACT_APP_ENVIRONMENT === "production" ? companyData : stockData;
+    const data = process.env.REACT_APP_ENVIRONMENT === 'production' ? companyData : [];
+
+    const columnLabels = [
+        'Ticker',
+        'Company Name',
+        'Market Cap',
+        'Price',
+        'Last Day Price',
+        'Volatile Stock',
+        'Investor Rating',
+    ];
 
     return (
         <div>
@@ -33,21 +52,17 @@ const TableOverview: React.FC = () => {
                 <table className="company-table">
                     <thead>
                     <tr>
-                        <th>Ticker</th>
-                        <th>Company Name</th>
-                        <th>Price</th>
-                        <th>Last Day Price</th>
-                        <th>Percent Change</th>
+                        {columnLabels.map((label) => (
+                            <th key={label}>{label}</th>
+                        ))}
                     </tr>
                     </thead>
                     <tbody>
-                    {data.map((company: CompanyData, index: React.Key | null | undefined) => (
-                        <tr key={index}>
-                            <td>{company.ticker}</td>
-                            <td>{company.companyName}</td>
-                            <td>{company.price}</td>
-                            <td>{company.lastDayPrice}</td>
-                            <td>{company.percentChange}%</td>
+                    {data.map((row, rowIndex) => (
+                        <tr key={rowIndex}>
+                            {columnLabels.map((label) => (
+                                <td key={label}>{row[toCamelCase(label) as keyof CompanyData]}</td>
+                            ))}
                         </tr>
                     ))}
                     </tbody>
