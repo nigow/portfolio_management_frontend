@@ -11,7 +11,7 @@ function App() {
         <div className="app-container">
             <FoldableSidebar />
             <div className="main-panel">
-                <h2>Portfolio Management System</h2>
+                <h2>Cat Portfolio</h2>
                 <div className="stack">
                     <TableOverview />
                     <AccountManipulator />
