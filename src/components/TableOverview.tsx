@@ -20,6 +20,7 @@ const toCamelCase = (input: string): string =>
 
 const TableOverview: React.FC = () => {
     const [companyData, setCompanyData] = useState<CompanyData[]>([]);
+    const [isLoading, setIsLoading] = useState(true); // Track loading state
     const endpoint = `${process.env.REACT_APP_ENDPOINT}/stocks`;
 
     useEffect(() => {
@@ -27,9 +28,11 @@ const TableOverview: React.FC = () => {
             .get(endpoint)
             .then((response) => {
                 setCompanyData(response.data);
+                setIsLoading(false);
             })
             .catch((error) => {
                 console.error(error);
+                setIsLoading(false);
             });
     }, []);
 
@@ -49,24 +52,28 @@ const TableOverview: React.FC = () => {
         <div>
             <h3>Stock Data Today</h3>
             <div className="table-container">
-                <table className="company-table">
-                    <thead>
-                    <tr>
-                        {columnLabels.map((label) => (
-                            <th key={label}>{label}</th>
-                        ))}
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {data.map((row, rowIndex) => (
-                        <tr key={rowIndex}>
+                {isLoading ? (
+                    <p>Loading...</p>
+                ) : (
+                    <table className="company-table">
+                        <thead>
+                        <tr>
                             {columnLabels.map((label) => (
-                                <td key={label}>{row[toCamelCase(label) as keyof CompanyData]}</td>
+                                <th key={label}>{label}</th>
                             ))}
                         </tr>
-                    ))}
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                        {data.map((row, rowIndex) => (
+                            <tr key={rowIndex}>
+                                {columnLabels.map((label) => (
+                                    <td key={label}>{row[toCamelCase(label) as keyof CompanyData]}</td>
+                                ))}
+                            </tr>
+                        ))}
+                        </tbody>
+                    </table>
+                )}
             </div>
         </div>
     );
