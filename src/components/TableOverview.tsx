@@ -34,7 +34,7 @@ const TableOverview: React.FC = () => {
                 console.error(error);
                 setIsLoading(false);
             });
-    }, []);
+    }, [endpoint]);
 
     const data = process.env.REACT_APP_ENVIRONMENT === 'production' ? companyData : [];
 

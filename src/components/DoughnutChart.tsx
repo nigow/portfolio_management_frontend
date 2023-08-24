@@ -8,7 +8,7 @@ const generateRandomColors = (count: number) => {
     for (let _ = 0; _ < count; _++) {
         const num = Math.round(0xffffff * Math.random());
         const r = num >> 16;
-        const g = num >> 8 & 255;
+        const g = (num >> 8) & 255;
         const b = num & 255;
         colors.push('rgb(' + r + ', ' + g + ', ' + b + ')');
     }

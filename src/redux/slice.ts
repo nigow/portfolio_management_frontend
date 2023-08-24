@@ -262,7 +262,7 @@ export const investmentSlice = createSlice({
         builder.addCase(updateInvestmentData.fulfilled, (state, action) => {
             const { ticker, amountOwned, costBasis, buyOrSell } = action.payload;
             const foundItemIndex = state.findIndex((item: InvestmentItem) => item.ticker === ticker);
-            const realAmountModified = buyOrSell == "Buy" ? amountOwned : -amountOwned;
+            const realAmountModified = buyOrSell === "Buy" ? amountOwned : -amountOwned;
             if (foundItemIndex !== -1) {
                 // @ts-ignore
                 // @ts-ignore

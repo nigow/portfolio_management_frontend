@@ -190,7 +190,7 @@ const AccountModal: React.FC<AccountModalProps> = ({ isOpen, closeModal, action,
                         </div>
                     </div>
                 )}
-                {action != accountActions.DELETE && accountType === accountTypes.STOCK && (
+                {action !== accountActions.DELETE && accountType === accountTypes.STOCK && (
                     <div>
                         <label>Select a ticker</label>
                         <select value={name} onChange={handleNameChangeSelect}>
